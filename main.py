@@ -4,19 +4,20 @@ import requests
 from user_agent import generate_user_agent
 import time
 
-# --- إعدادات الواجهة ---
+# --- إعداد الصفحة (يجب أن يكون أول سطر) ---
 st.set_page_config(page_title="علـش GX1GX1", layout="centered")
 
-# CSS لإصلاح مشكلة الشاشة السوداء وتنسيق الواجهة
+# --- التنسيق (خلفية سوداء وإطار ذهبي) ---
 st.markdown("""
     <style>
-    .stApp { background-color: #0e1117; color: white; }
+    .stApp { background-color: #000000; color: white; }
     .gold-border {
         border: 4px solid #D4AF37;
         padding: 10px;
         border-radius: 15px;
         text-align: center;
         margin-bottom: 20px;
+        box-shadow: 0px 0px 15px #D4AF37;
     }
     .telegram-link {
         display: block;
@@ -27,12 +28,22 @@ st.markdown("""
         padding: 12px;
         border-radius: 10px;
         text-decoration: none;
-        margin: 10px 0;
+        margin: 15px 0;
+        font-size: 18px;
+    }
+    /* جعل الأزرار ذهبية */
+    .stButton>button {
+        background-color: #D4AF37 !important;
+        color: black !important;
+        font-weight: bold !important;
+        width: 100%;
+        border-radius: 10px;
+        border: none;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# قائمة Device IDs الأصلية كما هي
+# --- قائمة Device IDs (كاملة كما طلبت) ---
 DEVICE_LIST = [
     "7569686276958406176:7569686357842675489:SO-51A:sony:58a9c9ab3a0e5b1f:625e1351-a2ba-4576-b421-2d3825d7fdc5",
     "7569686186635347488:7569686353766041376:SO-51A:sony:b9dddea1d47783ea:24ff104a-e595-48df-8731-724949a542da",
@@ -70,7 +81,7 @@ DEVICE_LIST = [
     "7569686186635527712:7569686357842904865:SO-51A:sony:ffa18d16a88bb959:545ecfc7-ef61-4313-8878-652fc2f3409e"
 ]
 
-# الواجهة الرئيسية
+# --- عرض الصورة والواجهة ---
 st.markdown('<div class="gold-border">', unsafe_allow_html=True)
 st.image("https://www.raed.net/img?id=1507882", width=300)
 st.markdown('</div>', unsafe_allow_html=True)
@@ -78,47 +89,86 @@ st.markdown('</div>', unsafe_allow_html=True)
 st.markdown('<a href="https://t.me/gx1gx1" class="telegram-link">علـش GX1GX1</a>', unsafe_allow_html=True)
 
 option = st.selectbox("اختر الخدمة:", ["1 – رشق مشاهدات ستوري", "2 – رشق مشاركـات ريــلــز", "3 – رشـق مشاهـدات ريـلـز"])
-target = st.text_input("اليوزر أو الرابط:")
+target_val = st.text_input("اليوزر أو الرابط:")
 
-if st.button("بدء العمل"):
-    if not target:
-        st.warning("أدخل البيانات أولاً")
+start_button = st.button("بدء الرشق")
+
+# --- المنطق البرمجي (يبدأ فقط عند الضغط) ---
+if start_button:
+    if not target_val:
+        st.warning("الرجاء كتابة اليوزر أو الرابط")
     else:
-        info_area = st.empty()
-        # لبدء الرشق دون توقف كما طلبت
+        st.success("جاري الرشق... (لا تغلق الصفحة)")
+        status_box = st.empty()
+        
+        # حلقة لانهائية (داخل الزر لتجنب تعليق الصفحة)
         while True:
-            f_ip = f"{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}"
-            f_device = random.choice(DEVICE_LIST)
+            # توليد بيانات وهمية جديدة
+            fake_ip = f"{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}"
+            fake_device = random.choice(DEVICE_LIST)
             ua = str(generate_user_agent())
             
-            # --- الكوكيز والتوكنات الأصلية حرفياً ---
+            # --- تجهيز البيانات بناءً على كودك الأصلي حرفياً ---
             if "1" in option:
-                u_url = 'https://leofame.com/ar/free-instagram-story-views'
-                ck = {'token': '65f7a4063b76f95104fb7e13228e9e13', 'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62'}
-                dt = {'token': '65f7a4063b76f95104fb7e13228e9e13', 'timezone_offset': 'Asia/Amman', 'free_link': target}
+                req_url = 'https://leofame.com/ar/free-instagram-story-views'
+                ck = {
+                    'token': '65f7a4063b76f95104fb7e13228e9e13',
+                    'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
+                    'cfzs_google-analytics_v4': '%7B%22mHFS_pageviewCounter%22%3A%7B%22v%22%3A%223%22%7D%7D',
+                    'cfz_google-analytics_v4': '%7B%22mHFS_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_engagementStart%22%3A%7B%22v%22%3A1765490695876%2C%22e%22%3A1797026691204%7D%2C%22mHFS_counter%22%3A%7B%22v%22%3A%2215%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_session_counter%22%3A%7B%22v%22%3A%223%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_ga4%22%3A%7B%22v%22%3A%22d62377ee-ab11-44f2-a93b-6c2cb64cee65%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_let%22%3A%7B%22v%22%3A%221765490685127%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_ga4sid%22%3A%7B%22v%22%3A%221006956886%22%2C%22e%22%3A1765492485127%7D%7D',
+                }
+                dt = {'token': '65f7a4063b76f95104fb7e13228e9e13', 'timezone_offset': 'Asia/Amman', 'free_link': target_val}
+                
             elif "2" in option:
-                u_url = 'https://leofame.com/ar/free-instagram-shares'
-                ck = {'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62', 'token': 'f99fa6c5a4df2792c19643c30cc5290c'}
-                dt = {'token': 'f99fa6c5a4df2792c19643c30cc5290c', 'timezone_offset': 'Asia/Amman', 'free_link': target, 'quantity': '100', 'speed': '-1'}
+                req_url = 'https://leofame.com/ar/free-instagram-shares'
+                ck = {
+                    'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
+                    'token': 'f99fa6c5a4df2792c19643c30cc5290c',
+                    'cfzs_google-analytics_v4': '%7B%22mHFS_pageviewCounter%22%3A%7B%22v%22%3A%222%22%7D%7D',
+                    'cfz_google-analytics_v4': '%7B%22mHFS_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_engagementStart%22%3A%7B%22v%22%3A1765632466422%2C%22e%22%3A1797168466703%7D%2C%22mHFS_counter%22%3A%7B%22v%22%3A%2233%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_session_counter%22%3A%7B%22v%22%3A%226%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_ga4%22%3A%7B%22v%22%3A%22d62377ee-ab11-44f2-a93b-6c2cb64cee65%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_let%22%3A%7B%22v%22%3A%221765632459976%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_ga4sid%22%3A%7B%22v%22%3A%22156770422%22%2C%22e%22%3A1765634259976%7D%7D',
+                }
+                dt = {'token': 'f99fa6c5a4df2792c19643c30cc5290c', 'timezone_offset': 'Asia/Amman', 'free_link': target_val, 'quantity': '100', 'speed': '-1'}
+                
             else:
-                u_url = 'https://leofame.com/ar/free-instagram-views'
-                ck = {'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62', 'token': 'e7ef36edf9d31e133ffcf756c462210b'}
-                dt = {'token': 'e7ef36edf9d31e133ffcf756c462210b', 'timezone_offset': 'Asia/Amman', 'free_link': target, 'quantity': '200', 'speed': '-1'}
+                req_url = 'https://leofame.com/ar/free-instagram-views'
+                ck = {
+                    'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
+                    'token': 'e7ef36edf9d31e133ffcf756c462210b',
+                    'cfzs_google-analytics_v4': '%7B%22mHFS_pageviewCounter%22%3A%7B%22v%22%3A%221%22%7D%7D',
+                    'cfz_google-analytics_v4': '%7B%22mHFS_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_engagementStart%22%3A%7B%22v%22%3A1765619149120%2C%22e%22%3A1797155149365%7D%2C%22mHFS_counter%22%3A%7B%22v%22%3A%2226%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_session_counter%22%3A%7B%22v%22%3A%225%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_ga4%22%3A%7B%22v%22%3A%22d62377ee-ab11-44f2-a93b-6c2cb64cee65%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_let%22%3A%7B%22v%22%3A%221765619143320%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_ga4sid%22%3A%7B%22v%22%3A%22692995886%22%2C%22e%22%3A1765620943320%7D%7D',
+                }
+                dt = {'token': 'e7ef36edf9d31e133ffcf756c462210b', 'timezone_offset': 'Asia/Amman', 'free_link': target_val, 'quantity': '200', 'speed': '-1'}
 
+            # --- الهيدر (الثابت + المتغير) ---
             hd = {
-                'user-agent': ua,
-                'X-Forwarded-For': f_ip,
-                'X-Device-ID': f_device,
-                'content-type': 'application/x-www-form-urlencoded'
+                'accept': '*/*',
+                'accept-language': 'ar-EG',
+                'content-type': 'application/x-www-form-urlencoded',
+                'origin': 'https://leofame.com',
+                'priority': 'u=1, i',
+                'referer': req_url,
+                'sec-ch-ua': '"Chromium";v="127", "Not)A;Brand";v="99", "Microsoft Edge Simulate";v="127", "Lemur";v="127"',
+                'sec-ch-ua-mobile': '?1',
+                'sec-ch-ua-platform': '"Android"',
+                'sec-fetch-dest': 'empty',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-site': 'same-origin',
+                'user-agent': ua,               # متغير
+                'X-Forwarded-For': fake_ip,     # متغير
+                'X-Device-ID': fake_device      # متغير
             }
 
             try:
-                r = requests.post(u_url, params={'api': '1'}, cookies=ck, headers=hd, data=dt, timeout=10).text
-                if "Please wait" in r or "success" in r.lower():
-                    info_area.success("✅ تم الرشق")
+                # محاولة الإرسال
+                req = requests.post(req_url, params={'api': '1'}, cookies=ck, headers=hd, data=dt, timeout=10).text
+                
+                # فحص النتيجة
+                if "Please wait hours" in req or "successfully" in req.lower():
+                    status_box.success("✅ تم الرشق بنجاح")
                 else:
-                    info_area.error("❌ فشل الرشق")
+                    status_box.error("❌ فشل الرشق.. جاري المحاولة")
             except:
-                pass
+                status_box.warning("⚠️ خطأ في الاتصال.. جاري المحاولة")
             
-            time.sleep(1) # تأخير بسيط لضمان استقرار السيرفر
+            # انتظار بسيط لتجنب انهيار الصفحة
+            time.sleep(0.5)
