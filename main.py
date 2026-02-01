@@ -4,24 +4,22 @@ import requests
 import user_agent
 from user_agent import generate_user_agent
 import time
+import os
 
 # --- إعدادات الواجهة الاحترافية ---
-st.set_page_config(page_title="Instagram Booster", layout="centered")
+st.set_page_config(page_title="Instagram Tools", layout="centered")
 
-# CSS لإخفاء شعارات ستريم ليت وتصميم الإطار الذهبي والواجهة
+# CSS لتجميل الواجهة وإخفاء شعارات ستريم ليت
 st.markdown("""
     <style>
-    /* إخفاء شريط ستريم ليت العلوي والقائمة */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     
-    /* تنسيق الخلفية العامة */
     .stApp {
         background-color: #000000;
     }
     
-    /* تصميم الإطار الذهبي للصورة */
     .gold-border {
         border: 4px solid #D4AF37;
         padding: 5px;
@@ -31,13 +29,19 @@ st.markdown("""
         display: inline-block;
     }
     
-    /* تنسيق النصوص */
-    h1, h2, h3, p {
-        color: #F - #D4AF37 !important;
+    .telegram-link {
+        display: block;
         text-align: center;
+        background-color: #D4AF37;
+        color: black !important;
+        font-weight: bold;
+        padding: 10px;
+        border-radius: 10px;
+        text-decoration: none;
+        margin-bottom: 20px;
+        font-size: 20px;
     }
-    
-    /* تنسيق الأزرار */
+
     .stButton>button {
         background-color: #D4AF37 !important;
         color: black !important;
@@ -54,29 +58,29 @@ st.markdown('<div style="text-align: center;"><div class="gold-border">', unsafe
 st.image("https://www.raed.net/img?id=1507882", width=350)
 st.markdown('</div></div>', unsafe_allow_html=True)
 
-st.markdown("<h1 style='color: #D4AF37;'>مرحباً بك في أداة ملهم السرحاني</h1>", unsafe_allow_html=True)
+# --- رابط التليجرام المطلوب ---
+st.markdown('<a href="https://t.me/gx1gx1" class="telegram-link">علـش GX1GX1</a>', unsafe_allow_html=True)
 
 # --- قائمة الخيارات ---
-st.markdown("<h3 style='text-align: right;'>اختر الخدمة المطلوبة:</h3>", unsafe_allow_html=True)
-choice = st.radio("", ["1 – رشق مشاهدات ستوري", "2 – رشق مشاركـات ريــلــز", "3 – رشـق مشاهـدات ريـلـز"])
+st.markdown("<h3 style='text-align: center; color: #D4AF37;'>اختر الخدمة:</h3>", unsafe_allow_html=True)
+choice = st.selectbox("", ["1 – رشق مشاهدات ستوري", "2 – رشق مشاركـات ريــلــز", "3 – رشـق مشاهـدات ريـلـز"])
 
 # --- حقول الإدخال ---
 if "1" in choice:
-    user_input = st.text_input("حط يوزر حسابك :", placeholder="مثال: m_sarhani")
+    user_input = st.text_input("حط يوزر حسابك :", key="user1")
 elif "2" in choice:
-    user_input = st.text_input("رابط الريلز حقك :", placeholder="ضع الرابط هنا...")
+    user_input = st.text_input("رابط الريلز حقك :", key="user2")
 else:
-    user_input = st.text_input("رابط الريلز :", placeholder="ضع الرابط هنا...")
+    user_input = st.text_input("رابط الريلز :", key="user3")
 
-start_btn = st.button("بدء عملية الرشق الآن")
+start_btn = st.button("بدء الرشق")
 
-# --- التنفيذ (بدون حذف أي حرف من الكوكيز أو الهيدرز) ---
+# --- التنفيذ (المحافظة على كامل الكود الأصلي بدون حذف حرف) ---
 if start_btn and user_input:
-    status_box = st.empty()
-    log_area = st.empty()
+    status_area = st.empty()
     
     if "1" in choice:
-        # --- كود رشق الستوري (Copy-Paste من كودك الأصلي) ---
+        # الكود الأصلي للخيار 1
         while True:
             cookies = {
                 'token': '65f7a4063b76f95104fb7e13228e9e13',
@@ -104,13 +108,13 @@ if start_btn and user_input:
             
             response = requests.post('https://leofame.com/ar/free-instagram-story-views', params=params, cookies=cookies, headers=headers, data=data).text
             if "Please wait hours" in response:
-                status_box.success("✅ تم رشـق مشاهدات الستوري")
+                status_area.success('✅ تم رشـق')
             else:
-                status_box.error("❌ فشـل بالرشق")
+                status_area.error('❌ فشـل بالرشق')
             time.sleep(2)
 
     elif "2" in choice:
-        # --- كود رشق المشاركات (بدون أي تعديل) ---
+        # الكود الأصلي للخيار 2
         while True:
             cookies = {
                 'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
@@ -138,13 +142,13 @@ if start_btn and user_input:
             
             response = requests.post('https://leofame.com/ar/free-instagram-shares', params=params, cookies=cookies, headers=headers, data=data).text
             if "Please wait hours" in response:
-                status_box.success("✅ تم رشـق مشاركات الريلز")
+                status_area.success('✅ تم رشـق')
             else:
-                status_box.error("❌ فشـل بالرشق")
+                status_area.error('❌ فشـل بالرشق')
             time.sleep(2)
 
     elif "3" in choice:
-        # --- كود رشق المشاهدات (كامل كما هو) ---
+        # الكود الأصلي للخيار 3
         while True:
             cookies = {
                 'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
@@ -172,9 +176,7 @@ if start_btn and user_input:
             
             response = requests.post('https://leofame.com/ar/free-instagram-views', params=params, cookies=cookies, headers=headers, data=data).text
             if "Please wait hours" in response:
-                status_box.success("✅ تم رشـق مشاهدات الريلز")
+                status_area.success('✅ تم رشـق')
             else:
-                status_box.error("❌ فشـل بالرشق")
+                status_area.error('❌ فشـل بالرشق')
             time.sleep(2)
-elif start_btn and not user_input:
-    st.warning("يرجى إدخال اليوزر أو الرابط أولاً!")
