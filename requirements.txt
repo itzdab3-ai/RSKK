@@ -1,4 +1,4 @@
+streamlit
 requests
-PyCryptor
-pycryptodome
-pycryptodomex
+user_agent
+python-cfonts
