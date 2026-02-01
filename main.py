@@ -4,10 +4,10 @@ import requests
 from user_agent import generate_user_agent
 import time
 
-# --- إعداد الصفحة ---
+# --- إعداد الصفحة (يجب أن يكون أول سطر) ---
 st.set_page_config(page_title="علـش GX1GX1", layout="centered")
 
-# --- التنسيق البصري الاحترافي ---
+# --- التنسيق البصري (إطار ذهبي وخلفية سوداء) ---
 st.markdown("""
     <style>
     .stApp { background-color: #000000; color: white; }
@@ -42,18 +42,18 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# --- دالة لتوليد هوية جهاز عشوائية تماماً ---
+# --- دالة توليد هوية جهاز عشوائية (تتغير مع كل طلب) ---
 def generate_random_device_id():
     part1 = str(random.randint(7000000000000000000, 7999999999999999999))
     part2 = str(random.randint(7000000000000000000, 7999999999999999999))
-    models = ["SO-51A", "SM-G998B", "Pixel-6", "RMX3085", "M2101K6G", "iPhone13,4"]
-    brands = ["sony", "samsung", "google", "realme", "xiaomi", "apple"]
+    models = ["SO-51A", "SM-S908B", "Pixel-7-Pro", "M2101K6G", "RMX3301", "iPhone14,3"]
+    brands = ["sony", "samsung", "google", "xiaomi", "realme", "apple"]
     idx = random.randint(0, len(models)-1)
     hex_id = "".join(random.choices("0123456789abcdef", k=16))
     uuid_val = f"{random.randint(10000000,99999999)}-{random.randint(1000,9999)}-4bd6-8423-56b589e8fc94"
     return f"{part1}:{part2}:{models[idx]}:{brands[idx]}:{hex_id}:{uuid_val}"
 
-# --- عرض الواجهة ---
+# --- الواجهة الرئيسية ---
 st.markdown('<div class="gold-border">', unsafe_allow_html=True)
 st.image("https://www.raed.net/img?id=1507882", width=300)
 st.markdown('</div>', unsafe_allow_html=True)
@@ -67,22 +67,22 @@ start_button = st.button("بدء الرشق")
 
 if start_button:
     if not target_val:
-        st.warning("الرجاء كتابة اليوزر أو الرابط")
+        st.warning("أدخل البيانات أولاً")
     else:
-        st.success("جاري الرشق بتغيير بيانات الجهاز والدولة تلقائياً...")
+        st.success("تم بدء الرشق بنظام تغيير الهوية التلقائي...")
         status_box = st.empty()
         
         while True:
-            # 1. تغيير الدولة (توليد IP عشوائي عالمي)
+            # 1. تغيير الـ IP (دولة مختلفة)
             fake_ip = f"{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}"
             
-            # 2. تغيير الجهاز (توليد Device ID جديد كلياً)
+            # 2. تغيير الجهاز (Device ID جديد)
             fake_device = generate_random_device_id()
             
             # 3. تغيير المتصفح (User Agent)
             ua = str(generate_user_agent())
             
-            # --- الحفاظ على كافة بياناتك الأصلية بدون حذف حرف واحد ---
+            # --- بيانات كودك الأصلي حرفياً دون حذف أو تعديل ---
             if "1" in option:
                 req_url = 'https://leofame.com/ar/free-instagram-story-views'
                 ck = {
@@ -111,7 +111,7 @@ if start_button:
                 }
                 dt = {'token': 'e7ef36edf9d31e133ffcf756c462210b', 'timezone_offset': 'Asia/Amman', 'free_link': target_val, 'quantity': '200', 'speed': '-1'}
 
-            # الهيدر المدمج (الثابت + المتغيرات الجديدة)
+            # --- دمج الهيدر الأصلي مع المتغيرات الجديدة ---
             hd = {
                 'accept': '*/*',
                 'accept-language': 'ar-EG',
@@ -124,12 +124,13 @@ if start_button:
             }
 
             try:
-                response = requests.post(req_url, params={'api': '1'}, cookies=ck, headers=hd, data=dt, timeout=10).text
-                if "successfully" in response.lower() or "Please wait" in response:
-                    status_box.success(f"✅ تم الرشق | الدولة: عشوائي | الجهاز: {fake_device.split(':')[2]}")
+                r = requests.post(req_url, params={'api': '1'}, cookies=ck, headers=hd, data=dt, timeout=10).text
+                if "success" in r.lower() or "Please wait" in r:
+                    status_box.success(f"✅ تم الإرسال | IP: {fake_ip} | الجهاز: {fake_device.split(':')[2]}")
                 else:
-                    status_box.error("❌ فشل الرشق.. جاري المحاولة ببيانات جديدة")
+                    status_box.error("❌ فشل الإرسال.. جاري التبديل لهوية جديدة")
             except:
-                status_box.warning("⚠️ مشكلة في الاتصال.. جاري إعادة المحاولة")
+                status_box.warning("⚠️ مشكلة في الاتصال.. جاري المحاولة")
             
-            time.sleep(1)
+            time.sleep(1) # تأخير بسيط لضمان ثبات السيرفر
+
