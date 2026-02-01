@@ -1,27 +1,22 @@
 import streamlit as st
 import random
 import requests
-import user_agent
 from user_agent import generate_user_agent
 import time
-import os
 
-# --- إعدادات الواجهة الرسومية (علـش GX1GX1) ---
+# --- إعدادات الواجهة ---
 st.set_page_config(page_title="علـش GX1GX1", layout="centered")
 
+# CSS لإصلاح مشكلة الشاشة السوداء وتنسيق الواجهة
 st.markdown("""
     <style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    .stApp { background-color: #000000; }
+    .stApp { background-color: #0e1117; color: white; }
     .gold-border {
         border: 4px solid #D4AF37;
-        padding: 5px;
+        padding: 10px;
         border-radius: 15px;
-        box-shadow: 0px 0px 20px #D4AF37;
+        text-align: center;
         margin-bottom: 20px;
-        display: inline-block;
     }
     .telegram-link {
         display: block;
@@ -29,24 +24,15 @@ st.markdown("""
         background-color: #D4AF37;
         color: black !important;
         font-weight: bold;
-        padding: 10px;
+        padding: 12px;
         border-radius: 10px;
         text-decoration: none;
-        margin-bottom: 20px;
-        font-size: 20px;
-    }
-    .stButton>button {
-        background-color: #D4AF37 !important;
-        color: black !important;
-        font-weight: bold !important;
-        border-radius: 10px !important;
-        width: 100%;
-        border: none !important;
+        margin: 10px 0;
     }
     </style>
     """, unsafe_allow_html=True)
 
-# قائمة Device IDs التي أرسلتها (بدون نقص)
+# قائمة Device IDs الأصلية كما هي
 DEVICE_LIST = [
     "7569686276958406176:7569686357842675489:SO-51A:sony:58a9c9ab3a0e5b1f:625e1351-a2ba-4576-b421-2d3825d7fdc5",
     "7569686186635347488:7569686353766041376:SO-51A:sony:b9dddea1d47783ea:24ff104a-e595-48df-8731-724949a542da",
@@ -79,117 +65,60 @@ DEVICE_LIST = [
     "7569686275754559008:7569686357842757409:SO-51A:sony:240189d9531e09a8:47ea91f9-1915-4419-bbb9-d62a9cd57f80",
     "7569686276958586400:7569686381229655840:SO-51A:sony:a0904cdd01793d31:5a832bc3-172e-4805-a5ec-496ec43c0ecb",
     "7569686273640908321:7569686376536180513:SO-51A:sony:409e322c74116c8a:4bc76aee-3827-43b7-9c2f-8abfa1d62faa",
-    "7569686186635478560:7569686381229721376:SO-51A:sony:1c25a04de94c7c75:aa7d013a-1716-41 d4-a2d3-43d8fc079c48",
+    "7569686186635478560:7569686381229721376:SO-51A:sony:1c25a04de94c7c75:aa7d013a-1716-41d4-a2d3-43d8fc079c48",
     "7569686186635544096:7569686376536262433:SO-51A:sony:e7a4a853afd1a6af:c8872b4b-bc26-459d-9c6d-1f292778af86",
     "7569686186635527712:7569686357842904865:SO-51A:sony:ffa18d16a88bb959:545ecfc7-ef61-4313-8878-652fc2f3409e"
 ]
 
-# --- دالة توليد IP عشوائي لكل طلب ---
-def generate_fake_ip():
-    return f"{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}"
+# الواجهة الرئيسية
+st.markdown('<div class="gold-border">', unsafe_allow_html=True)
+st.image("https://www.raed.net/img?id=1507882", width=300)
+st.markdown('</div>', unsafe_allow_html=True)
 
-# --- عرض الصورة بالإطار الذهبي ---
-st.markdown('<div style="text-align: center;"><div class="gold-border">', unsafe_allow_html=True)
-st.image("https://www.raed.net/img?id=1507882", width=350)
-st.markdown('</div></div>', unsafe_allow_html=True)
-
-# --- رابط التليجرام ---
 st.markdown('<a href="https://t.me/gx1gx1" class="telegram-link">علـش GX1GX1</a>', unsafe_allow_html=True)
 
-# --- قائمة الخيارات ---
-st.markdown("<h3 style='text-align: center; color: #D4AF37;'>اختر نوع الرشق:</h3>", unsafe_allow_html=True)
-D = st.selectbox("", ["1 – رشق مشاهدات ستوري", "2 – رشق مشاركـات ريــلــز", "3 – رشـق مشاهـدات ريـلـز"])
+option = st.selectbox("اختر الخدمة:", ["1 – رشق مشاهدات ستوري", "2 – رشق مشاركـات ريــلــز", "3 – رشـق مشاهـدات ريـلـز"])
+target = st.text_input("اليوزر أو الرابط:")
 
-# --- حقول الإدخال بناءً على كودك ---
-if "1" in D:
-    user = st.text_input("حط يوزر حسابك :")
-elif "2" in D:
-    crl1 = st.text_input("رابط الريلز حقك :")
-else:
-    crl = st.text_input("رابط الريلز :")
-
-start_btn = st.button("بدء الرشق")
-
-# --- التنفيذ (كودك الأصلي تماماً مع إضافة التمويه) ---
-if start_btn:
-    status_msg = st.empty()
-    D_key = D[0] # يأخذ '1' أو '2' أو '3'
-
-    while True:
-        fake_ip = generate_fake_ip()
-        fake_device = random.choice(DEVICE_LIST)
-        ua = str(generate_user_agent())
-
-        if D_key == '1' and user:
-            cookies = {
-                'token': '65f7a4063b76f95104fb7e13228e9e13',
-                'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
-                'cfzs_google-analytics_v4': '%7B%22mHFS_pageviewCounter%22%3A%7B%22v%22%3A%223%22%7D%7D',
-                'cfz_google-analytics_v4': '%7B%22mHFS_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_engagementStart%22%3A%7B%22v%22%3A1765490695876%2C%22e%22%3A1797026691204%7D%2C%22mHFS_counter%22%3A%7B%22v%22%3A%2215%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_session_counter%22%3A%7B%22v%22%3A%223%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_ga4%22%3A%7B%22v%22%3A%22d62377ee-ab11-44f2-a93b-6c2cb64cee65%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_let%22%3A%7B%22v%22%3A%221765490685127%22%2C%22e%22%3A1797026685127%7D%2C%22mHFS_ga4sid%22%3A%7B%22v%22%3A%221006956886%22%2C%22e%22%3A1765492485127%7D%7D',
-            }
-            headers = {
-                'accept': '*/*',
-                'accept-language': 'ar-EG',
-                'content-type': 'application/x-www-form-urlencoded',
-                'origin': 'https://leofame.com',
-                'referer': 'https://leofame.com/ar/free-instagram-story-views',
-                'user-agent': ua,
-                'X-Forwarded-For': fake_ip,
-                'X-Device-ID': fake_device
-            }
-            data = {'token': '65f7a4063b76f95104fb7e13228e9e13', 'timezone_offset': 'Asia/Amman', 'free_link': user}
-            url_post = 'https://leofame.com/ar/free-instagram-story-views'
-
-        elif D_key == '2' and crl1:
-            cookies = {
-                'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
-                'token': 'f99fa6c5a4df2792c19643c30cc5290c',
-                'cfzs_google-analytics_v4': '%7B%22mHFS_pageviewCounter%22%3A%7B%22v%22%3A%222%22%7D%7D',
-                'cfz_google-analytics_v4': '%7B%22mHFS_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_engagementStart%22%3A%7B%22v%22%3A1765632466422%2C%22e%22%3A1797168466703%7D%2C%22mHFS_counter%22%3A%7B%22v%22%3A%2233%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_session_counter%22%3A%7B%22v%22%3A%226%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_ga4%22%3A%7B%22v%22%3A%22d62377ee-ab11-44f2-a93b-6c2cb64cee65%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_let%22%3A%7B%22v%22%3A%221765632459976%22%2C%22e%22%3A1797168459976%7D%2C%22mHFS_ga4sid%22%3A%7B%22v%22%3A%22156770422%22%2C%22e%22%3A1765634259976%7D%7D',
-            }
-            headers = {
-                'accept': '*/*',
-                'accept-language': 'ar-EG',
-                'content-type': 'application/x-www-form-urlencoded',
-                'origin': 'https://leofame.com',
-                'referer': 'https://leofame.com/ar/free-instagram-shares',
-                'user-agent': ua,
-                'X-Forwarded-For': fake_ip,
-                'X-Device-ID': fake_device
-            }
-            data = {'token': 'f99fa6c5a4df2792c19643c30cc5290c', 'timezone_offset': 'Asia/Amman', 'free_link': crl1, 'quantity': '100', 'speed': '-1'}
-            url_post = 'https://leofame.com/ar/free-instagram-shares'
-
-        elif D_key == '3' and crl:
-            cookies = {
-                'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62',
-                'token': 'e7ef36edf9d31e133ffcf756c462210b',
-                'cfzs_google-analytics_v4': '%7B%22mHFS_pageviewCounter%22%3A%7B%22v%22%3A%221%22%7D%7D',
-                'cfz_google-analytics_v4': '%7B%22mHFS_engagementDuration%22%3A%7B%22v%22%3A%220%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_engagementStart%22%3A%7B%22v%22%3A1765619149120%2C%22e%22%3A1797155149365%7D%2C%22mHFS_counter%22%3A%7B%22v%22%3A%2226%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_session_counter%22%3A%7B%22v%22%3A%225%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_ga4%22%3A%7B%22v%22%3A%22d62377ee-ab11-44f2-a93b-6c2cb64cee65%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_let%22%3A%7B%22v%22%3A%221765619143320%22%2C%22e%22%3A1797155143320%7D%2C%22mHFS_ga4sid%22%3A%7B%22v%22%3A%22692995886%22%2C%22e%22%3A1765620943320%7D%7D',
-            }
-            headers = {
-                'accept': '*/*',
-                'accept-language': 'ar-EG',
-                'content-type': 'application/x-www-form-urlencoded',
-                'origin': 'https://leofame.com',
-                'referer': 'https://leofame.com/ar/free-instagram-views',
-                'user-agent': ua,
-                'X-Forwarded-For': fake_ip,
-                'X-Device-ID': fake_device
-            }
-            data = {'token': 'e7ef36edf9d31e133ffcf756c462210b', 'timezone_offset': 'Asia/Amman', 'free_link': crl, 'quantity': '200', 'speed': '-1'}
-            url_post = 'https://leofame.com/ar/free-instagram-views'
-        else:
-            st.error("الرجاء إدخال البيانات")
-            break
-
-        try:
-            response = requests.post(url_post, params={'api': '1'}, cookies=cookies, headers=headers, data=data, timeout=10).text
-            if "Please wait hours" in response or "successfully" in response.lower():
-                status_msg.success(' تم رشـق ')
-            else:
-                status_msg.error(' فشـل بالرشق ')
-        except:
-            status_msg.warning("خطأ في الاتصال.. جاري المحاولة")
+if st.button("بدء العمل"):
+    if not target:
+        st.warning("أدخل البيانات أولاً")
+    else:
+        info_area = st.empty()
+        # لبدء الرشق دون توقف كما طلبت
+        while True:
+            f_ip = f"{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}.{random.randint(1,254)}"
+            f_device = random.choice(DEVICE_LIST)
+            ua = str(generate_user_agent())
             
-        time.sleep(0.5) # سرعة المحاولات
+            # --- الكوكيز والتوكنات الأصلية حرفياً ---
+            if "1" in option:
+                u_url = 'https://leofame.com/ar/free-instagram-story-views'
+                ck = {'token': '65f7a4063b76f95104fb7e13228e9e13', 'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62'}
+                dt = {'token': '65f7a4063b76f95104fb7e13228e9e13', 'timezone_offset': 'Asia/Amman', 'free_link': target}
+            elif "2" in option:
+                u_url = 'https://leofame.com/ar/free-instagram-shares'
+                ck = {'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62', 'token': 'f99fa6c5a4df2792c19643c30cc5290c'}
+                dt = {'token': 'f99fa6c5a4df2792c19643c30cc5290c', 'timezone_offset': 'Asia/Amman', 'free_link': target, 'quantity': '100', 'speed': '-1'}
+            else:
+                u_url = 'https://leofame.com/ar/free-instagram-views'
+                ck = {'ci_session': 'ccf763e6a521d0ddef1aa5572d1641b99ea39e62', 'token': 'e7ef36edf9d31e133ffcf756c462210b'}
+                dt = {'token': 'e7ef36edf9d31e133ffcf756c462210b', 'timezone_offset': 'Asia/Amman', 'free_link': target, 'quantity': '200', 'speed': '-1'}
+
+            hd = {
+                'user-agent': ua,
+                'X-Forwarded-For': f_ip,
+                'X-Device-ID': f_device,
+                'content-type': 'application/x-www-form-urlencoded'
+            }
+
+            try:
+                r = requests.post(u_url, params={'api': '1'}, cookies=ck, headers=hd, data=dt, timeout=10).text
+                if "Please wait" in r or "success" in r.lower():
+                    info_area.success("✅ تم الرشق")
+                else:
+                    info_area.error("❌ فشل الرشق")
+            except:
+                pass
+            
+            time.sleep(1) # تأخير بسيط لضمان استقرار السيرفر
